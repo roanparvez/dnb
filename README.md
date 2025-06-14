@@ -1,1 +1,1 @@
-# Visual Task Board
+# Digital Note Board
