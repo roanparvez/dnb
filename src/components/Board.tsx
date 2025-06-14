@@ -1,12 +1,15 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { NoteCard } from "@/components/note-card";
-import type { Note } from "@/lib/types";
+import NoteCard from "@/components/note-card";
+import AddNoteDialog from "@/components/add-note-dialog";
+import { Note } from "@/lib/types";
 
 const Board = () => {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newNotePosition, setNewNotePosition] = useState({ x: 0, y: 0 });
   const boardRef = useRef<HTMLDivElement>(null);
   const [maxZIndex, setMaxZIndex] = useState(1);
 
@@ -27,7 +30,8 @@ const Board = () => {
       // Set an example note if none exist
       const exampleNote: Note = {
         id: "1",
-        content: "Welcome! Your board is ready. You can drag notes and reorder them.",
+        content:
+          "Double-click anywhere on the board to add a new note. Drag notes to reposition them.",
         color: "bg-yellow-200",
         position: { x: 50, y: 50 },
         zIndex: 1,
@@ -43,6 +47,35 @@ const Board = () => {
       localStorage.setItem("notice-board-notes", JSON.stringify(notes));
     }
   }, [notes]);
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    if (boardRef.current) {
+      const rect = boardRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Only open dialog if the double click was on the board itself, not on a note
+      if (e.target === boardRef.current || boardRef.current.contains(e.target as Node)) {
+        const targetElement = e.target as HTMLElement;
+        if (!targetElement.closest(".note-card")) {
+          setNewNotePosition({ x, y });
+          setIsDialogOpen(true);
+        }
+      }
+    }
+  };
+
+  const addNote = (note: Omit<Note, "id" | "position" | "zIndex">) => {
+    const newZIndex = maxZIndex + 1;
+    setMaxZIndex(newZIndex);
+    const newNote: Note = {
+      ...note,
+      id: crypto.randomUUID(),
+      position: newNotePosition,
+      zIndex: newZIndex,
+    };
+    setNotes([...notes, newNote]);
+  };
 
   const updateNote = (updatedNote: Note) => {
     setNotes(notes.map((note) => (note.id === updatedNote.id ? updatedNote : note)));
@@ -72,6 +105,7 @@ const Board = () => {
           backgroundSize: "cover",
           backgroundRepeat: "repeat",
         }}
+        onDoubleClick={handleDoubleClick}
       >
         {notes.map((note) => (
           <NoteCard
@@ -83,6 +117,8 @@ const Board = () => {
             bringToFront={bringToFront}
           />
         ))}
+
+        <AddNoteDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onAddNote={addNote} />
       </div>
     </div>
   );

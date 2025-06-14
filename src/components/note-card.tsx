@@ -1,13 +1,13 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
 import { useState, useRef, useEffect } from "react";
 import { Edit, Trash2, Check, X } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type { Note } from "@/lib/types";
+import { Note } from "@/lib/types";
 
 interface NoteCardProps {
   note: Note;
@@ -17,13 +17,7 @@ interface NoteCardProps {
   bringToFront: (id: string) => void;
 }
 
-export function NoteCard({
-  note,
-  onUpdate,
-  onDelete,
-  onPositionChange,
-  bringToFront,
-}: NoteCardProps) {
+const NoteCard = ({ note, onUpdate, onDelete, onPositionChange, bringToFront }: NoteCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(note.content);
   const [position, setPosition] = useState(note.position);
@@ -174,4 +168,5 @@ export function NoteCard({
       )}
     </Card>
   );
-}
+};
+export default NoteCard;
