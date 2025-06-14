@@ -101,7 +101,7 @@ const Board = () => {
         ref={boardRef}
         className="container mx-auto p-4 min-h-screen relative"
         style={{
-          backgroundImage: "url('/cork-board.jpg')",
+          backgroundImage: "url('/bg.png')",
           backgroundSize: "cover",
           backgroundRepeat: "repeat",
         }}
